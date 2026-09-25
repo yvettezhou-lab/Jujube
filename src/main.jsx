@@ -11,12 +11,12 @@ const addDays=(s,n)=>{const d=fromIso(s);d.setDate(d.getDate()+n);return iso(d)}
 const fmt=s=>{const d=fromIso(s);return d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日'};
 const today=()=>iso(new Date());
 
-function initial(){return{cycles:[],active:null,encUsed:[]}}
+function initial(){return{cycles:[],active:null,encUsed:[],settings:{notify:true}}}
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||initial()}catch{return initial()}}
 function save(s){localStorage.setItem(KEY,JSON.stringify(s))}
 
 function App(){
- const [state,setState]=useState(load); const [tab,setTab]=useState('today'); const [modal,setModal]=useState(null); const [notify,setNotify]=useState(true);
+ const [state,setState]=useState(load); const [tab,setTab]=useState('today'); const [modal,setModal]=useState(null); const notify=state.settings?.notify!==false;
  useEffect(()=>save(state),[state]);
  useEffect(()=>{if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});},[]);
  const active=state.active;
@@ -62,7 +62,7 @@ function App(){
     </>}
    </main>}
    {tab==='history'&&<main><h2>历史周期</h2>{state.cycles.length===0?<div className="empty">还没有历史周期。</div>:state.cycles.map(c=><div className="history" key={c.id}><div><b>{c.status==='completed'?'✓':'✕'} {c.status==='completed'?'已完成':'已放弃'}</b><p>{fmt(c.start)} → {fmt(c.end||c.completed.at(-1)||c.start)}</p></div><strong>{c.completed.length}/49</strong><button onClick={()=>deleteHistory(c.id)}>删除</button></div>)}</main>}
-   {tab==='settings'&&<main><h2>设置</h2><div className="setting"><div className="settingText"><b>22:00提醒</b><span>打开「枣」时，会在22:00提醒今天还没有完成</span></div><label className="switch"><input type="checkbox" checked={notify} onChange={async e=>{const on=e.target.checked;if(on&&'Notification'in window&&Notification.permission==='default')await Notification.requestPermission();setNotify(on)}}/><i/></label></div><p className="note">提醒需要允许通知，并且需要「枣」保持在后台可被系统唤醒的范围内。数据只保存在本机，不上传服务器。</p>{active&&<button className="danger" onClick={()=>setModal({type:'abandon',active})}>放弃当前周期</button>}{!active&&<button className="outline" onClick={newCycle}>新开一个周期</button>}</main>}
+   {tab==='settings'&&<main><h2>设置</h2><div className="setting"><div className="settingText"><b>22:00提醒</b><span>打开「枣」时，会在22:00提醒今天还没有完成</span></div><label className="switch"><input type="checkbox" checked={notify} onChange={async e=>{const on=e.target.checked;if(on&&'Notification'in window&&Notification.permission==='default')await Notification.requestPermission();setState(s=>({...s,settings:{...(s.settings||{}),notify:on}}))}}/><i/></label></div><p className="note">提醒需要允许通知，并且需要「枣」保持在后台可被系统唤醒的范围内。数据只保存在本机，不上传服务器。</p>{active&&<button className="danger" onClick={()=>setModal({type:'abandon',active})}>放弃当前周期</button>}{!active&&<button className="outline" onClick={newCycle}>新开一个周期</button>}</main>}
    <nav><button className={tab==='today'?'on':''} onClick={()=>setTab('today')}>今日</button><button className={tab==='history'?'on':''} onClick={()=>setTab('history')}>历史</button><button className={tab==='settings'?'on':''} onClick={()=>setTab('settings')}>设置</button></nav>
    {modal&&<Modal modal={modal} close={()=>setModal(null)} start={startCycle} complete={confirmMissing} abandon={abandon} />}
  </div>
