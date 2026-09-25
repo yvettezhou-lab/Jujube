@@ -34,8 +34,10 @@ function App(){
    else{setState({...state,active:next});setModal({type:'complete',count:next.completed.length})}
  }
  function confirmMissing(){
-   const next={...active,interruptions:[...new Set([...active.interruptions,...missing])]};
-   setState({...state,active:next});setModal(null);
+   const updated={...active,interruptions:[...new Set([...active.interruptions,...missing])]};
+   const next={...updated,completed:[...updated.completed,today()]};
+   if(next.completed.length===49){next.status='completed';next.end=today();setState({...state,active:null,cycles:[next,...state.cycles]});setModal({type:'done',count:49});}
+   else{setState({...state,active:next});setModal({type:'complete',count:next.completed.length});}
  }
  function abandon(){if(!active)return;const c={...active,status:'abandoned',end:today()};setState({...state,active:null,cycles:[c,...state.cycles]});setModal(null);setTab('history')}
  function deleteHistory(id){setState({...state,cycles:state.cycles.filter(c=>c.id!==id)})}
@@ -50,8 +52,8 @@ function App(){
       {already?<div className="doneCard"><span>✓</span><div><b>今天已完成</b><small>已完成 {completed} / 49</small></div></div>:<button className="complete" onClick={completeToday}>今日完成</button>}
       <div className="enc">{completed===0?'准备好了吗？':(milestones[completed]||encouragements[(completed+state.encUsed.length)%encouragements.length])}</div>
     </section>
-    <section className="info"><div><span>预计完成</span><b>{fmt(addDays(active.start,48))}</b></div><div><span>中断</span><b>{active.interruptions.length} 天</b></div></section>
-    <button className="textBtn" onClick={()=>setModal({type:'cycle'})}>查看本周期</button>
+    <section className="info"><div><span>预计完成</span><b>{fmt(addDays(active.start,48+active.interruptions.length))}</b></div><div><span>中断</span><b>{active.interruptions.length} 天</b></div></section>
+    <button className="textBtn" onClick={()=>setModal({type:'cycle',active})}>查看本周期</button>
     </>}
    </main>}
    {tab==='history'&&<main><h2>历史周期</h2>{state.cycles.length===0?<div className="empty">还没有历史周期。</div>:state.cycles.map(c=><div className="history" key={c.id}><div><b>{c.status==='completed'?'✓':'✕'} {c.status==='completed'?'已完成':'已放弃'}</b><p>{fmt(c.start)} → {fmt(c.end||c.completed.at(-1)||c.start)}</p></div><strong>{c.completed.length}/49</strong><button onClick={()=>deleteHistory(c.id)}>删除</button></div>)}</main>}
@@ -66,6 +68,6 @@ function Modal({modal,close,start,complete,abandon}){if(modal.type==='start')ret
 if(modal.type==='missing')return <div className="shade"><div className="modal"><h3>发现中断日期</h3><p>以下日期没有记录，请确认这些天确实中断：</p><div className="missing">{modal.days.map(d=><span key={d}>{fmt(d)}</span>)}</div><div className="actions"><button className="outline" onClick={close}>返回</button><button className="complete" onClick={complete}>确认中断并完成今天</button></div></div></div>;
 if(modal.type==='complete')return <div className="shade"><div className="modal celebrate"><div className="big">🎉</div><h3>已完成 {modal.count} / 49</h3><p>{milestones[modal.count]||encouragements[Math.floor(Math.random()*encouragements.length)]}</p><button className="complete" onClick={close}>好，继续</button></div></div>;
 if(modal.type==='done')return <div className="shade"><div className="modal celebrate"><div className="big">🏆</div><h3>49 / 49</h3><p><b>大功告成！</b><br/>这一周期全部完成，辛苦啦！</p><button className="complete" onClick={close}>完成</button></div></div>;
-if(modal.type==='abandon')return <div className="shade"><div className="modal"><h3>确定放弃当前周期吗？</h3><p>当前已完成 <b>{/* safe display via */''}</b> 次。放弃后会保留在历史记录中，不影响重新开始。</p><div className="actions"><button className="outline" onClick={close}>取消</button><button className="danger" onClick={abandon}>确认放弃</button></div></div></div>;
-return <div className="shade"><div className="modal"><h3>本周期</h3><p>从 {fmt(modal.start||'2026-01-01')} 开始。</p><button className="outline" onClick={close}>关闭</button></div></div>}
+if(modal.type==='abandon')return <div className="shade"><div className="modal"><h3>确定放弃当前周期吗？</h3><p>当前已完成 <b>{modal.active?.completed?.length||0} / 49</b> 次。放弃后会保留在历史记录中，不影响重新开始。</p><div className="actions"><button className="outline" onClick={close}>取消</button><button className="danger" onClick={abandon}>确认放弃</button></div></div></div>;
+return <div className="shade"><div className="modal"><h3>本周期</h3><p>开始：{fmt(modal.active.start)}<br/>当前完成：<b>{modal.active.completed.length} / 49</b><br/>中断：{modal.active.interruptions.length?modal.active.interruptions.map(fmt).join('、'):'暂无'}<br/>预计完成：{fmt(addDays(modal.active.start,48+modal.active.interruptions.length))}</p><button className="outline" onClick={close}>关闭</button></div></div>}
 createRoot(document.getElementById('root')).render(<App/>);
