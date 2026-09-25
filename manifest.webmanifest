@@ -1,1 +1,1 @@
-{"name":"枣","short_name":"枣","start_url":"/","display":"standalone","background_color":"#fbf7f0","theme_color":"#fbf7f0","lang":"zh-CN","icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
+{"name":"枣","short_name":"枣","start_url":"/","display":"standalone","background_color":"#fbf7f0","theme_color":"#fbf7f0","lang":"zh-CN","icons":[{"src":"/jujube-icon.png","sizes":"1024x1024","type":"image/png","purpose":"any maskable"}]}
