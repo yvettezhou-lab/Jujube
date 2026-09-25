@@ -19,12 +19,13 @@ function App(){
  const [state,setState]=useState(load); const [tab,setTab]=useState('today'); const [modal,setModal]=useState(null); const [notify,setNotify]=useState(true);
  useEffect(()=>save(state),[state]);
  useEffect(()=>{if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});},[]);
- useEffect(()=>{const check=()=>{if(!active||already||!notify||new Date().getHours()!==22)return;const key='jujube_last_reminder';if(localStorage.getItem(key)===today())return;localStorage.setItem(key,today());if('Notification'in window&&Notification.permission==='granted')new Notification('枣',{body:'今天还没有完成哦，加油！',icon:'/icon.svg'});};check();const timer=setInterval(check,30000);return()=>clearInterval(timer)},[active,already,notify]);
  const active=state.active;
  const completed=active?.completed?.length||0;
  const progress=Math.round(completed/49*100);
  const missing=useMemo(()=>{if(!active)return[];const a=[];let d=active.start;while(d<today()){if(!active.interruptions.includes(d)&&!active.completed.includes(d))a.push(d);d=addDays(d,1)}return a},[active]);
  const already=!!active?.completed?.includes(today());
+ useEffect(()=>{const check=()=>{if(!active||already||!notify||new Date().getHours()!==22)return;const key='jujube_last_reminder';if(localStorage.getItem(key)===today())return;localStorage.setItem(key,today());if('Notification'in window&&Notification.permission==='granted')new Notification('枣',{body:'今天还没有完成哦，加油！',icon:'/icon.svg'});};check();const timer=setInterval(check,30000);return()=>clearInterval(timer)},[active,already,notify]);
+
 
  function startCycle(){const s=today(),c={id:Date.now(),start:s,completed:[],interruptions:[],status:'active'};setState({...state,active:c});setTab('today');setModal(null)}
  function newCycle(){setModal({type:'start'})}
