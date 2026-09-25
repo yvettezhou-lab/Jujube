@@ -17,11 +17,11 @@ function save(s){localStorage.setItem(KEY,JSON.stringify(s))}
 
 function App(){
  const [state,setState]=useState(load); const [tab,setTab]=useState('today'); const [modal,setModal]=useState(null);
- useEffect(()=>save(state),[state]);
+ useEffect(()=>save(state),[state]);\n useEffect(()=>{if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});},[]);
  const active=state.active;
  const completed=active?.completed?.length||0;
  const progress=Math.round(completed/49*100);
- const missing=useMemo(()=>{if(!active||!active.completed.length)return[];const last=active.completed[active.completed.length-1];let a=[];let d=addDays(last,1);while(d<today()){if(!active.interruptions.includes(d)&&!active.completed.includes(d))a.push(d);d=addDays(d,1)}return a},[active]);
+ const missing=useMemo(()=>{if(!active)return[];const a=[];let d=active.start;while(d<today()){if(!active.interruptions.includes(d)&&!active.completed.includes(d))a.push(d);d=addDays(d,1)}return a},[active]);
  const already=!!active?.completed?.includes(today());
 
  function startCycle(){const s=today(),c={id:Date.now(),start:s,completed:[],interruptions:[],status:'active'};setState({...state,active:c});setTab('today');setModal(null)}
