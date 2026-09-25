@@ -68,7 +68,7 @@ function App(){
  </div>
 }
 
-function Empty({onStart}){return <main className="emptyPage"><img className="seedIcon" src="/icon.svg"/><h1>还没有开始</h1><p>一个周期 49 次，每天完成一次。</p><button className="complete" onClick={onStart}>＋ 新建周期</button></main>}
+function Empty({onStart}){return <main className="emptyPage"><img className="seedIcon" src="/jujube-jar.png" alt="一罐枣"/><h1>还没有开始</h1><p>一个周期 49 次，每天完成一次。</p><button className="complete" onClick={onStart}>＋ 新建周期</button></main>}
 function Modal({modal,close,start,complete,abandon}){if(modal.type==='start')return <div className="shade"><div className="modal"><h3>🌱 准备开始新的49次周期</h3><p>如果今天开始：</p><div className="estimate">{fmt(today())}<span>→</span>{fmt(addDays(today(),48))}</div><p>预计完成日期：<b>{fmt(addDays(today(),48))}</b><br/>如果中间有中断，实际完成日期会相应顺延。</p><div className="actions"><button className="outline" onClick={close}>以后再说</button><button className="complete" onClick={start}>今天开始</button></div></div></div>;
 if(modal.type==='missing')return <div className="shade"><div className="modal"><h3>发现中断日期</h3><p>以下日期没有记录，请确认这些天确实中断：</p><div className="missing">{modal.days.map(d=><span key={d}>{fmt(d)}</span>)}</div><div className="actions"><button className="outline" onClick={close}>返回</button><button className="complete" onClick={complete}>确认中断并完成今天</button></div></div></div>;
 if(modal.type==='complete')return <div className="shade"><div className="modal celebrate"><div className="big">🎉</div><h3>已完成 {modal.count} / 49</h3><p>{milestones[modal.count]||encouragements[(modal.count-1)%encouragements.length]}</p><button className="complete" onClick={close}>好，继续</button></div></div>;
