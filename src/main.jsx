@@ -21,7 +21,7 @@ function App(){
  useEffect(()=>{if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});},[]);
  const active=state.active;
  const completed=active?.completed?.length||0;
- const progress=Math.round(completed/49*100);
+ const progress=Math.round(completed/49*100);\n const expectedEnd=active?addDays(active.start,48+active.interruptions.length):null;\n const streak=active?(()=>{let n=0,d=today();while(active.completed.includes(d)){n++;d=addDays(d,-1)}return n})():0;
  const missing=useMemo(()=>{if(!active)return[];const a=[];let d=active.start;while(d<today()){if(!active.interruptions.includes(d)&&!active.completed.includes(d))a.push(d);d=addDays(d,1)}return a},[active]);
  const already=!!active?.completed?.includes(today());
  useEffect(()=>{const check=()=>{if(!active||already||!notify||new Date().getHours()!==22)return;const key='jujube_last_reminder';if(localStorage.getItem(key)===today())return;localStorage.setItem(key,today());if('Notification'in window&&Notification.permission==='granted')new Notification('枣',{body:'今天还没有完成哦，加油！',icon:'/icon.svg'});};check();const timer=setInterval(check,30000);return()=>clearInterval(timer)},[active,already,notify]);
@@ -55,7 +55,7 @@ function App(){
       {already?<div className="doneCard"><span>✓</span><div><b>今天已完成</b><small>已完成 {completed} / 49</small></div></div>:<button className="complete" onClick={completeToday}>今日完成</button>}
       <div className="enc">{completed===0?'准备好了吗？':(milestones[completed]||encouragements[(active.encIndex||0)%encouragements.length])}</div>
     </section>
-    <section className="info"><div><span>预计完成</span><b>{fmt(addDays(active.start,48+active.interruptions.length))}</b></div><div><span>中断</span><b>{active.interruptions.length} 天</b></div></section>
+    <section className="info"><div><span>预计完成</span><b>{fmt(expectedEnd)}</b></div><div><span>中断</span><b>{active.interruptions.length} 天</b></div></section><div className="streak">{streak>1?`连续完成 ${streak} 天`:'今天是新的一步'}</div>
     <button className="textBtn" onClick={()=>setModal({type:'cycle',active})}>查看本周期</button>
     </>}
    </main>}
