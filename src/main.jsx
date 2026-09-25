@@ -17,7 +17,8 @@ function save(s){localStorage.setItem(KEY,JSON.stringify(s))}
 
 function App(){
  const [state,setState]=useState(load); const [tab,setTab]=useState('today'); const [modal,setModal]=useState(null);
- useEffect(()=>save(state),[state]);\n useEffect(()=>{if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});},[]);
+ useEffect(()=>save(state),[state]);
+ useEffect(()=>{if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});},[]);
  const active=state.active;
  const completed=active?.completed?.length||0;
  const progress=Math.round(completed/49*100);
