@@ -1,1 +1,1 @@
-{"name":"枣","short_name":"枣","start_url":"/","display":"standalone","background_color":"#fbf7f0","theme_color":"#fbf7f0","lang":"zh-CN","icons":[]}
+{"name":"枣","short_name":"枣","start_url":"/","display":"standalone","background_color":"#fbf7f0","theme_color":"#fbf7f0","lang":"zh-CN","icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
