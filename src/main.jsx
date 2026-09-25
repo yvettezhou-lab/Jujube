@@ -21,7 +21,9 @@ function App(){
  useEffect(()=>{if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});},[]);
  const active=state.active;
  const completed=active?.completed?.length||0;
- const progress=Math.round(completed/49*100);\n const expectedEnd=active?addDays(active.start,48+active.interruptions.length):null;\n const streak=active?(()=>{let n=0,d=today();while(active.completed.includes(d)){n++;d=addDays(d,-1)}return n})():0;
+ const progress=Math.round(completed/49*100);
+ const expectedEnd=active?addDays(active.start,48+active.interruptions.length):null;
+ const streak=active?(()=>{let n=0,d=today();while(active.completed.includes(d)){n++;d=addDays(d,-1)}return n})():0;
  const missing=useMemo(()=>{if(!active)return[];const a=[];let d=active.start;while(d<today()){if(!active.interruptions.includes(d)&&!active.completed.includes(d))a.push(d);d=addDays(d,1)}return a},[active]);
  const already=!!active?.completed?.includes(today());
  useEffect(()=>{const check=()=>{if(!active||already||!notify||new Date().getHours()!==22)return;const key='jujube_last_reminder';if(localStorage.getItem(key)===today())return;localStorage.setItem(key,today());if('Notification'in window&&Notification.permission==='granted')new Notification('枣',{body:'今天还没有完成哦，加油！',icon:'/icon.svg'});};check();const timer=setInterval(check,30000);return()=>clearInterval(timer)},[active,already,notify]);
